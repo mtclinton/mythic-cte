@@ -11,9 +11,12 @@ This project ships a Postgres image preloaded with a large, mythology-themed dat
 ## Build & Run
 
 ```bash
-cd /home/max/projects/learning-cte
-docker build -t learning-cte-postgres .
-docker run --rm -p 5432:5432 --name myth-db learning-cte-postgres
+docker build -t mythic-cte .
+docker run --rm \
+  -p 5432:5432 \
+  --name myth-db \
+  -e POSTGRES_PASSWORD=supersecret \
+  mythic-cte
 ```
 
 On first startup, Postgres executes `init.sql`, which:
@@ -25,16 +28,16 @@ Stopping and re-running the container reuses the seeded volume unless you mounte
 
 ## Connect and Explore
 
-Default credentials match the official Postgres image variables in the `Dockerfile`:
+Default credentials match the `Dockerfile`, except the password must be supplied at runtime:
 
 - DB: `app_db`
 - User: `app_user`
-- Password: `app_password`
+- Password: whatever you pass via `POSTGRES_PASSWORD`
 
 Connect with `psql`:
 
 ```bash
-psql postgresql://app_user:app_password@localhost:5432/app_db
+psql postgresql://app_user:supersecret@localhost:5432/app_db
 ```
 
 `init.sql` already enables timing, but you can toggle manually with `\timing on`.
