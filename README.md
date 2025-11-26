@@ -47,7 +47,7 @@ psql postgresql://app_user:supersecret@localhost:5432/app_db
 Use `benchmark_queries.sql` for ready-made pairs of CTE vs non-CTE statements:
 
 ```bash
-psql postgresql://app_user:app_password@localhost:5432/app_db -f /home/max/projects/learning-cte/benchmark_queries.sql
+psql postgresql://app_user:supersecret@localhost:5432/app_db -f /home/max/projects/learning-cte/benchmark_queries.sql
 ```
 
 Each section contains:
