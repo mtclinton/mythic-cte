@@ -1,12 +1,20 @@
--- Benchmark-ready SQL snippets comparing CTE vs non-CTE approaches.
--- Use `\timing on` (already enabled in init.sql) and optionally
--- `EXPLAIN (ANALYZE, BUFFERS)` around each query to capture differences.
+-- Benchmark-ready SQL script that prints only execution timings.
+-- psql prints the label via \echo + elapsed time via \timing.
+
+\pset pager off
+\pset tuples_only on
+\timing on
+
+\echo 'Running benchmark suite...'
 
 ------------------------------------------------------------
 -- 1) Omen pressure analytics (non-recursive case)
 ------------------------------------------------------------
 
 -- CTE version: single scan of the last 14 days of omens.
+\echo ''
+\echo 'CTE - Omen pressure analytics'
+\o /dev/null
 WITH recent AS (
     SELECT *
     FROM omens
@@ -36,8 +44,12 @@ JOIN deities d ON d.id = dr.deity_id
 JOIN region_density rd ON rd.region = dr.region
 ORDER BY dr.omen_count DESC
 LIMIT 25;
+\o
 
 -- Non-CTE version: repeated subqueries trigger two scans of the filtered omens.
+\echo ''
+\echo 'Non-CTE - Omen pressure analytics'
+\o /dev/null
 SELECT
     dr.deity_id,
     d.name,
@@ -62,12 +74,16 @@ JOIN (
 ) rd ON rd.region = dr.region
 ORDER BY dr.omen_count DESC
 LIMIT 25;
+\o
 
 ------------------------------------------------------------
 -- 2) Hero quest performance rollup (non-recursive case)
 ------------------------------------------------------------
 
 -- CTE version: the quests table is scanned once per purpose.
+\echo ''
+\echo 'CTE - Hero quest performance'
+\o /dev/null
 WITH hero_effort AS (
     SELECT hero_id, COUNT(*) AS quests_attempted, AVG(difficulty) AS avg_difficulty
     FROM quests
@@ -98,8 +114,12 @@ JOIN hero_success hs ON hs.hero_id = h.id
 LEFT JOIN recent_battles rb ON rb.hero_id = h.id
 ORDER BY he.quests_attempted DESC
 LIMIT 25;
+\o
 
 -- Non-CTE version: redefines the same aggregations inline, forcing extra scans.
+\echo ''
+\echo 'Non-CTE - Hero quest performance'
+\o /dev/null
 SELECT
     h.id,
     h.name,
@@ -127,12 +147,16 @@ LEFT JOIN (
 ) rb ON rb.hero_id = h.id
 ORDER BY he.quests_attempted DESC
 LIMIT 25;
+\o
 
 ------------------------------------------------------------
 -- 3) Pantheon lineage (recursive case)
 ------------------------------------------------------------
 
 -- Recursive CTE: explores arbitrary lineage depth.
+\echo ''
+\echo 'CTE - Pantheon lineage depth >= 8'
+\o /dev/null
 WITH RECURSIVE lineage AS (
     SELECT
         id,
@@ -159,8 +183,12 @@ FROM lineage
 WHERE depth >= 8
 ORDER BY depth DESC, name
 LIMIT 50;
+\o
 
 -- Non-CTE approximation: fixed-depth self joins; expensive and limited.
+\echo ''
+\echo 'Non-CTE - Pantheon lineage via self joins'
+\o /dev/null
 SELECT
     d0.id   AS root_id,
     d6.id   AS node_id,
@@ -177,8 +205,9 @@ WHERE d0.parent_id IS NULL
   AND d6.id IS NOT NULL
 ORDER BY d6.id DESC
 LIMIT 50;
+\o
 
--- Tip: wrap each block with EXPLAIN (ANALYZE, BUFFERS) to record timing:
--- EXPLAIN (ANALYZE, BUFFERS)
--- WITH recent AS (...) SELECT ...;
+\timing off
+\echo ''
+\echo 'Benchmark suite complete.'
 
