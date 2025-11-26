@@ -127,6 +127,8 @@ INSERT INTO heroes (id, name, city_state, patron_deity_id, fame_rank, birth_era)
     (11,'Medea',        'Colchis', 14, 11, -1300),
     (12,'Hippolyta',    'Themyscira',15, 9, -1250);
 
+SELECT setval(pg_get_serial_sequence('heroes', 'id'), (SELECT MAX(id) FROM heroes));
+
 WITH deity_bounds AS (SELECT MAX(id) AS deity_max FROM deities)
 INSERT INTO heroes (name, city_state, patron_deity_id, fame_rank, birth_era)
 SELECT
@@ -136,8 +138,6 @@ SELECT
     (random() * 100)::INT + 1,
     -1600 + (gs % 900)
 FROM generate_series(1, 150000) AS gs, deity_bounds;
-
-SELECT setval(pg_get_serial_sequence('heroes', 'id'), (SELECT MAX(id) FROM heroes));
 
 WITH hero_bounds AS (SELECT MAX(id) AS hero_max FROM heroes),
      deity_bounds AS (SELECT MAX(id) AS deity_max FROM deities)
