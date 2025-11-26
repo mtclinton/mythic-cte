@@ -15,7 +15,7 @@ docker build -t mythic-cte .
 docker run --rm \
   -p 5432:5432 \
   --name myth-db \
-  -e POSTGRES_PASSWORD=supersecret \
+  -e POSTGRES_PASSWORD=ambrosia \
   mythic-cte
 ```
 
@@ -30,14 +30,14 @@ Stopping and re-running the container reuses the seeded volume unless you mounte
 
 Default credentials match the `Dockerfile`, except the password must be supplied at runtime:
 
-- DB: `app_db`
-- User: `app_user`
+- DB: `db`
+- User: `demigod`
 - Password: whatever you pass via `POSTGRES_PASSWORD`
 
 Connect with `psql`:
 
 ```bash
-psql postgresql://app_user:supersecret@localhost:5432/app_db
+psql postgresql://demigod:ambrosia@localhost:5432/db
 ```
 
 `init.sql` already enables timing, but you can toggle manually with `\timing on`.
@@ -47,7 +47,7 @@ psql postgresql://app_user:supersecret@localhost:5432/app_db
 Use `benchmark_queries.sql` for ready-made pairs of CTE vs non-CTE statements:
 
 ```bash
-psql postgresql://app_user:supersecret@localhost:5432/app_db -f ./benchmark_queries.sql
+psql postgresql://demigod:ambrosia@localhost:5432/db -f ./benchmark_queries.sql
 ```
 
 Each section contains:

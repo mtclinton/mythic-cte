@@ -1,8 +1,8 @@
 FROM postgres:latest
 
 # Set default database credentials; override at runtime as needed.
-ENV POSTGRES_DB=app_db \
-    POSTGRES_USER=app_user
+ENV POSTGRES_DB=db \
+    POSTGRES_USER=demigod
 
 # POSTGRES_PASSWORD intentionally omitted so the value is provided at runtime.
 
